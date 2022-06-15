@@ -23,20 +23,15 @@ func generatePattern(_ pauses: [Int]) -> String {
 
 let patterns: [[String]] = [
     [
-        generatePattern([9,9]),
-//        generatePattern([4,4,9]),
-//        generatePattern([4,9,4])
+        generatePattern([4,4,2,2])
     ],
     [
-        generatePattern([9,9,4,4,4]),
-        generatePattern([9,4,9,4,4]),
-//        generatePattern([9,9,9,4,4,4])
+        generatePattern([4,2,4,2]), // 1011011
+        generatePattern([2,2,4,4,6]), // 1110101001
+        generatePattern([2,4,4,6,6,2]), // 1101010010011
+        generatePattern([6,4,2,4,2,6,6,2]), // 10010110110010011
+        generatePattern([2,2,2,8,4,4,2,4,4,8]) // 111100010101101010001
     ]
-//    [
-//        generatePattern([9,4,9,4,4,4,9]),
-//        generatePattern([6,6,9,9,6,6,4,6,6]),
-//        generatePattern([9,9,6,9,6,6,4,6,9,9,6,9,9])
-//    ],
 ]
 
 struct Level: Hashable {

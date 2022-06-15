@@ -4,8 +4,8 @@ struct Rhythm {
     typealias Pattern = String
 
     let pattern: Pattern
-    let stepTime: TimeInterval = 0.1
-    let audioDuration: TimeInterval = 0.1
+    let stepTime: TimeInterval = 0.1 // 100ms
+    let audioDuration: TimeInterval = 0.1 // 100ms
     let soundName: String = "bam"
 
     var bamsCount: Int {
