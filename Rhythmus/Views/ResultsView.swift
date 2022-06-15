@@ -30,6 +30,22 @@ final class ResultsView: UIView {
         return imageView
     }()
 
+    let nextButton: UIButton = {
+        let button = UIButton()
+        button.titleLabel?.font = .systemFont(ofSize: 27, weight: .semibold)
+        button.setTitleColor(.white, for: .normal)
+        button.setTitle("Next", for: .normal)
+        return button
+    }()
+
+    let retryButton: UIButton = {
+        let button = UIButton()
+        button.titleLabel?.font = .systemFont(ofSize: 27, weight: .semibold)
+        button.setTitleColor(.white, for: .normal)
+        button.setTitle("Retry", for: .normal)
+        return button
+    }()
+
     private let rhythmContainer = UIView()
 
     override init(frame: CGRect) {
@@ -52,6 +68,8 @@ final class ResultsView: UIView {
         addSubview(titleLabel)
         addSubview(subtitleLabel)
         addSubview(resultImageView)
+        addSubview(retryButton)
+        addSubview(nextButton)
 
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -71,6 +89,18 @@ final class ResultsView: UIView {
             resultImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
             resultImageView.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.3),
             resultImageView.heightAnchor.constraint(equalTo: resultImageView.widthAnchor)
+        ])
+
+        retryButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            nextButton.trailingAnchor.constraint(equalTo: centerXAnchor, constant: -16),
+            retryButton.topAnchor.constraint(equalTo: resultImageView.bottomAnchor, constant: 16),
+        ])
+
+        nextButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            retryButton.leadingAnchor.constraint(equalTo: centerXAnchor, constant: 16),
+            nextButton.topAnchor.constraint(equalTo: resultImageView.bottomAnchor, constant: 16),
         ])
     }
 }

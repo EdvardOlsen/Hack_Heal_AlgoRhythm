@@ -24,21 +24,25 @@ func generatePattern(_ pauses: [Int]) -> String {
 let patterns: [[String]] = [
     [
         generatePattern([9,9]),
-        generatePattern([4,4,9]),
-        generatePattern([4,9,4])
+//        generatePattern([4,4,9]),
+//        generatePattern([4,9,4])
     ],
     [
         generatePattern([9,9,4,4,4]),
         generatePattern([9,4,9,4,4]),
-        generatePattern([9,9,9,4,4,4])
-    ],
-    [
-        generatePattern([9,4,9,4,4,4,9]),
-        generatePattern([6,6,9,9,6,6,4,6,6]),
-        generatePattern([9,9,6,9,6,6,4,6,9,9,6,9,9])
-    ],
+//        generatePattern([9,9,9,4,4,4])
+    ]
+//    [
+//        generatePattern([9,4,9,4,4,4,9]),
+//        generatePattern([6,6,9,9,6,6,4,6,6]),
+//        generatePattern([9,9,6,9,6,6,4,6,9,9,6,9,9])
+//    ],
 ]
 
+struct Level: Hashable {
+    let major: Int
+    let minor: Int
+}
 
 class ViewController: UIViewController {
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -53,11 +57,13 @@ class ViewController: UIViewController {
     private var isPlaying: Bool { player.timeControlStatus != .paused }
     private var playedTimings = [TimeInterval]()
     private var isRecording: Bool = false
-    private var currentIndex: (Int, Int) = (0, 0)
+    private var currentLevel = Level(major: 0, minor: 0)
+
+    private var results = [Level: Float]()
 
     private var currentRhythm: Rhythm {
         Rhythm(
-            pattern: patterns[currentIndex.0][currentIndex.1]
+            pattern: patterns[currentLevel.major][currentLevel.minor]
         )
     }
 
@@ -192,31 +198,61 @@ class ViewController: UIViewController {
 
         var titleText: String
         var imageName: String
-        if evaluation > 0.85 {
-            goToNextLevel()
-            titleText = "Congratulations!"
-            updateLevelLabel()
-            imageName = "done"
-        } else {
-            titleText = "So close!"
-            imageName = "retry"
-        }
+
+        titleText = "Next Level!"
+        imageName = "done"
+
         rootView.resultsView.titleLabel.text = titleText
-        rootView.resultsView.subtitleLabel.text = "Your score is \(Int(evaluation * 100))%"
         rootView.resultsView.resultImageView.image = UIImage(named: imageName)
 
+        rootView.resultsView.nextButton.addTarget(self, action: #selector(handleNext), for: .touchUpInside)
+        rootView.resultsView.retryButton.addTarget(self, action: #selector(handleRetry), for: .touchUpInside)
+
+        self.results[currentLevel] = Float(evaluation)
         resetLevel()
 
         rootView.toggleViews(rootView.resultsView, animated: true)
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) { [unowned self] in
+    }
+
+    @objc
+    private func handleNext() {
+        let isLastMajor = currentLevel.major == patterns.count - 1
+        let isLastMinor = currentLevel.minor == patterns[currentLevel.major].count - 1
+        let isLastLevel = isLastMajor && isLastMinor
+
+        goToNextLevel()
+        updateLevelLabel()
+
+        if isLastLevel {
+            var resultText = "TOTAL"
+            resultText += "\n\n"
+            let valuableResults = results.filter { $0.key.major != 0 }
+            valuableResults.forEach { key, value in
+                resultText.append("Level \(key.major):\(key.minor + 1): \(value)\n")
+            }
+            resultText.append("Average: \(valuableResults.values.reduce(0, +) / Float(valuableResults.values.count))")
+            rootView.totalView.totalTextView.text = resultText
+            self.rootView.toggleViews(self.rootView.totalView, animated: true)
+            self.rootView.totalView.doneButton.addTarget(self, action: #selector(handleRetry), for: .touchUpInside)
+        } else {
             self.rootView.toggleViews(self.rootView.recordingView, animated: true)
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
+                self.togglePlayback()
+            }
+        }
+    }
+
+    @objc
+    private func handleRetry() {
+        self.rootView.toggleViews(self.rootView.recordingView, animated: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
             self.togglePlayback()
         }
     }
 
     private func goToNextLevel() {
-        var majorIndex = currentIndex.0
-        var minorIndex = currentIndex.1
+        var majorIndex = currentLevel.major
+        var minorIndex = currentLevel.minor
         if minorIndex < patterns[majorIndex].count - 1 {
             minorIndex += 1
         } else if majorIndex < patterns.count - 1 {
@@ -226,11 +262,15 @@ class ViewController: UIViewController {
             majorIndex = 0
             minorIndex = 0
         }
-        currentIndex = (majorIndex, minorIndex)
+        currentLevel = Level(major: majorIndex, minor: minorIndex)
     }
 
     private func updateLevelLabel() {
-        rootView.recordingView.levelLabel.text = "Level \(currentIndex.0 + 1):\(currentIndex.1 + 1)"
+        if currentLevel.major == 0 { // test level
+            rootView.recordingView.levelLabel.text = "Training \(currentLevel.minor + 1)"
+        } else {
+            rootView.recordingView.levelLabel.text = "Level \(currentLevel.major) : \(currentLevel.minor + 1)"
+        }
     }
 }
 

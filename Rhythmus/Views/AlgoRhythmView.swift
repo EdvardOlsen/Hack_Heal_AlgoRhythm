@@ -10,6 +10,7 @@ import UIKit
 final class AlgoRhythmView: UIView {
     let recordingView = RecordingView()
     let resultsView = ResultsView()
+    let totalView = TotalView()
 
     private let backgroundImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "Background"))
@@ -41,6 +42,7 @@ final class AlgoRhythmView: UIView {
             animations: {
                 self.recordingView.alpha = currentView === self.recordingView ? 1.0 : 0.0
                 self.resultsView.alpha = currentView === self.resultsView ? 1.0 : 0.0
+                self.totalView.alpha = currentView === self.totalView ? 1.0 : 0.0
             },
             completion: nil
         )
@@ -50,6 +52,7 @@ final class AlgoRhythmView: UIView {
         addSubview(backgroundImageView)
         addSubview(recordingView)
         addSubview(resultsView)
+        addSubview(totalView)
 
         backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -73,6 +76,14 @@ final class AlgoRhythmView: UIView {
             resultsView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             resultsView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
             resultsView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+        ])
+
+        totalView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            totalView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+            totalView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            totalView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            totalView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
         ])
     }
 }
