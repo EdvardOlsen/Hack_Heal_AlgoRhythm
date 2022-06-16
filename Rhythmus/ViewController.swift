@@ -45,7 +45,6 @@ class ViewController: UIViewController {
     }
 
     let player = AVPlayer()
-    var soundId: SystemSoundID = 0
 
     let rhythmContainer = UIView()
 
@@ -74,9 +73,6 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        let clapUrl = Bundle.main.url(forResource: "bam", withExtension: "mp3")!
-        AudioServicesCreateSystemSoundID(clapUrl as CFURL, &soundId)
 
         playerToken = player.addPeriodicTimeObserver(
             forInterval: CMTime(seconds: 0.01, preferredTimescale: 1000),
@@ -159,8 +155,6 @@ class ViewController: UIViewController {
 
     @objc
     private func handleRhythmButtonTap() {
-        AudioServicesPlaySystemSound(soundId)
-
         rootView.recordingView.playCircleAnimation()
 
         guard let recordingStartTime = recordingStartTime else {
@@ -222,7 +216,13 @@ class ViewController: UIViewController {
             var resultText = "TOTAL"
             resultText += "\n\n"
             let valuableResults = results.filter { $0.key.major != 0 }
-            valuableResults.forEach { key, value in
+            let sortedResults = valuableResults.keys.sorted { lhs, rhs in
+                if lhs.major > rhs.major { return false }
+                if lhs.major < rhs.major { return true }
+                return lhs.minor < rhs.minor
+            }
+            sortedResults.forEach { key in
+                let value = valuableResults[key]!
                 resultText.append("Level \(key.major):\(key.minor + 1): \(value)\n")
             }
             resultText.append("Average: \(valuableResults.values.reduce(0, +) / Float(valuableResults.values.count))")
